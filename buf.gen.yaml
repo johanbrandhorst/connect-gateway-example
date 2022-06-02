@@ -1,0 +1,33 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/johanbrandhorst/connect-gateway-example/proto
+    except:
+      - buf.build/googleapis/googleapis
+plugins:
+  - remote: buf.build/protocolbuffers/plugins/go:v1.28.0-1
+    out: proto
+    opt:
+      - paths=source_relative
+  - remote: buf.build/bufbuild/plugins/connect-go:v0.1.0-1
+    out: proto
+    opt:
+      - paths=source_relative
+  - remote: buf.build/grpc/plugins/go:v1.2.0-1
+    out: proto
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
+  - remote: buf.build/grpc-ecosystem/plugins/grpc-gateway:v2.10.2-1
+    # Note: This is a super hacky way to get the gateway generator
+    # to output into a separate directory. Do not try this at home.
+    out: proto/users/v1/usersv1gateway
+    opt:
+      - paths=import
+      - module=github.com/johanbrandhorst/connect-gateway-example/proto/users/v1
+      - standalone=true
+  - remote: buf.build/grpc-ecosystem/plugins/openapiv2:v2.10.2-1
+    out: third_party/OpenAPI
+    opt:
+      - json_names_for_fields=false

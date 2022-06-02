@@ -1,0 +1,12 @@
+version: v1
+name: buf.build/johan/connect-gateway-example
+deps:
+  - buf.build/googleapis/googleapis
+lint:
+  use:
+    - DEFAULT
+  ignore_only:
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - users/v1/users.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - users/v1/users.proto

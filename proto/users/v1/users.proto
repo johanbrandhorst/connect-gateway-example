@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package users.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
+
+service UserService {
+  rpc AddUser(AddUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/api/v1/users"
+      body: "*"
+    };
+  }
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{id}"
+    };
+  }
+  rpc ListUsers(ListUsersRequest) returns (stream User) {
+    option (google.api.http) = {
+      get: "/api/v1/users"
+    };
+  }
+  rpc UpdateUser(UpdateUserRequest) returns (User) {
+    option (google.api.http) = {
+      patch: "/api/v1/user/{user.id}"
+      body: "user"
+    };
+  }
+}
+
+message AddUserRequest {
+  string email = 1;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message ListUsersRequest {}
+
+message UpdateUserRequest {
+  User user = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message User {
+  // Id uniquely identifies a user. Output only.
+  string id = 1;
+  string email = 2;
+  // Output only.
+  google.protobuf.Timestamp create_time = 3;
+}
