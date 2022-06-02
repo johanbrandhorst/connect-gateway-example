@@ -3,12 +3,11 @@ package server
 import (
 	"context"
 	"sync"
+	"fmt"
 
 	connect "github.com/bufbuild/connect-go"
 	"github.com/gofrs/uuid"
 	usersv1 "github.com/johanbrandhorst/connect-gateway-example/proto/users/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -51,7 +50,7 @@ func (b *Backend) GetUser(ctx context.Context, req *connect.Request[usersv1.GetU
 		}
 	}
 
-	return nil, status.Errorf(codes.NotFound, "user with ID %q could not be found", req.Msg.GetId())
+	return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user with ID %q could not be found", req.Msg.GetId()))
 }
 
 // ListUsers lists all users in the store.
@@ -82,7 +81,7 @@ func (b *Backend) UpdateUser(ctx context.Context, req *connect.Request[usersv1.U
 		}
 	}
 	if u == nil {
-		return nil, status.Errorf(codes.NotFound, "user with ID %q could not be found", req.Msg.GetUser().GetId())
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("user with ID %q could not be found", req.Msg.GetUser().GetId()))
 	}
 
 	for _, path := range req.Msg.GetUpdateMask().GetPaths() {
@@ -90,7 +89,7 @@ func (b *Backend) UpdateUser(ctx context.Context, req *connect.Request[usersv1.U
 		case "email":
 			u.Email = req.Msg.GetUser().GetEmail()
 		default:
-			return nil, status.Errorf(codes.InvalidArgument, "cannot update field %q on user", path)
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("cannot update field %q on user", path))
 		}
 	}
 
